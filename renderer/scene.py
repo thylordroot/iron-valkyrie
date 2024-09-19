@@ -19,5 +19,5 @@ from abc import *
 
 class Scene(ABC):
     @abstractmethod
-    def render(context):
+    def render(self, context):
         pass;

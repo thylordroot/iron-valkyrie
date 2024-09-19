@@ -14,4 +14,39 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from .title import *
+
+import cv2
+import numpy
+
+class Image:
+    # Properties
+
+    def width(self):
+        return numpy.size(self._img, 0)
+        
+    def height(self):
+        return numpy.size(self._img, 1)
+        
+    def dim(self):
+        return [self.width(), self.height()]
+       
+    # Constructors
+        
+    def __init__(self, img):
+        self._img = img
+    
+    def create(width, height):
+        return Image(numpy.zeros((width, height, 3), numpy.uint8))
+        
+    # Image Routines
+    
+    def composeEx(self, img, srcX, srcY, destX, destY, width, height):
+        pass
+        
+    # I/O
+    
+    def load(path):
+        return Frame(cv2.imread(path))
+        
+    def save(self, path):
+        cv2.imwrite(path, self._img)
