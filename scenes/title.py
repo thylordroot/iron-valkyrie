@@ -19,5 +19,8 @@ from renderer.scene import Scene
 
 class TitleScene(Scene):
     def render(self, context):
+        if (context.framesElapsed() == 0)
+            context.frameBuffer().write("foo.png");
+    
         if (context.framesElapsed() >= 600):
             context.makeSceneDone()
