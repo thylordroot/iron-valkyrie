@@ -40,7 +40,11 @@ class Image:
     
     def create(width, height):
         return Image(numpy.zeros((height, width, 3), numpy.uint8))
-        
+    
+    # Image Routines - Linear Algebra
+    def scale(self, fx, fy):
+        return Image(cv2.resize(self._img, (0,0), fx=fx, fy=fy))
+    
     # Image Routines - Copy
     
     def _composeRGBFromRGBA(self, img, srcX, srcY, destX, destY, width, height):

@@ -20,6 +20,6 @@
 from renderer import VideoRenderer
 from scenes import *
 
-renderer = VideoRenderer("test.avi");
+renderer = VideoRenderer("test.mp4");
 renderer.renderScenes(TitleScene());
 renderer.close();

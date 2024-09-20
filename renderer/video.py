@@ -29,14 +29,17 @@ class VideoRenderer:
     def __init__(self, path):
         self._context = RenderContext()
         self._writer = cv2.VideoWriter(path, 
-            cv2.VideoWriter_fourcc(*"mp4v"),
-            self._context.fps(), self._context.dim())
+            cv2.VideoWriter_fourcc(*"fmp4"),
+            self._context.fps(), 
+            self._context.actualDim(), True)
+        print(self._context.actualDim())
         
     # Rendering
     
     def _renderSceneFrame(self, scene):
-        self._context.renderScene(scene)
-        self._writer.write(self._context.frameBuffer()._img)
+        frame = self._context.renderScene(scene)
+        
+        self._writer.write(frame._img)
         if (self._context.sceneDone()):
             self._context._sceneDone = False
             return False

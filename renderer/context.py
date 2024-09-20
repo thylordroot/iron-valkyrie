@@ -51,6 +51,24 @@ class RenderContext:
     def sceneDone(self):
         return self._sceneDone
 
+    def par(self): 
+        return (4/3)/(1.6)
+    
+    def scaleFactors(self):
+        par = self.par()
+        if (par < 1):
+            return (1, 1/par)
+        else:
+            return (par, 1)
+    
+    def dim(self):
+        return self._frameBuffer.dim()
+    
+    def actualDim(self):
+        f = self.scaleFactors()
+        dim = self._frameBuffer.dim()
+        return (int(f[0] * dim[0]), int(f[1] * dim[1]))
+
     # Constructors
 
     def __init__(self):
@@ -72,3 +90,10 @@ class RenderContext:
         scene.render(self)
         self._totalFrames = self._totalFrames + 1
         self._framesElapsed = self._framesElapsed + 1
+        
+        # Now yield the frame; although the logical resolution of mode 13h is 
+        # 320x200, it does not have square pixels. Physically, this needs to 
+        # fit into 320x240, which means that we need to correct the image for a
+        # PAR of 1/1.2
+        scaleFactors = self.scaleFactors()
+        return self._frameBuffer.scale(scaleFactors[0], scaleFactors[1])
