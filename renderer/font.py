@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 #  Iron Valkyrie - A Demo Presentation
 #
 #    Copyright (C) 2024  thylordroot
@@ -10,18 +8,30 @@
 #    (at your option) any later version.
 #
 #    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    but WITHOUT ANY WARRANTY; without even t implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from renderer import VideoRenderer, Font
-from scenes import *
+from .atlas import Atlas
+import glob
 
-Font.bootstrapFonts()
+class Font:
+    # Properties
 
-renderer = VideoRenderer("test.mp4");
-renderer.renderScenes(TitleScene());
-renderer.close();
+    _fonts = dict()
+    
+    
+    
+    # Constructors
+    
+    def __init__(self, atlas):
+        self._atlas = atlas
+    
+    def load(path, width, height, count=-1):
+        return Font(Atlas.load(path, width, height, count))
+        
+    def bootstrapFonts():
+        print(glob.glob("assets/png/font/*.png"))

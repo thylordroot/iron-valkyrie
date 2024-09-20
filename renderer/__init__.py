@@ -16,5 +16,7 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from .scene import *
 from .image import *
+from .atlas import *
+from .font import *
 from .context import *
 from .video import *
