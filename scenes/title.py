@@ -16,11 +16,20 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from renderer.scene import Scene
+from renderer.image import Image
 
 class TitleScene(Scene):
+    def __init__(self):
+        self._background = Image.load("assets/png/title/background.png")
+        print(self._background.dim())
+        print(self._background.channels())
+
     def render(self, context):
-        if (context.framesElapsed() == 0)
-            context.frameBuffer().write("foo.png");
+        buffer = context.frameBuffer()
     
-        if (context.framesElapsed() >= 600):
+        # Copy background
+        buffer.copy(self._background)
+        buffer.fillRect(0, 0, buffer.width(), context.framesElapsed(), (0, 0, 0))
+    
+        if (context.framesElapsed() >= 60):
             context.makeSceneDone()

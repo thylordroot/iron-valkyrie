@@ -22,10 +22,13 @@ class Image:
     # Properties
 
     def width(self):
-        return numpy.size(self._img, 0)
+        return numpy.size(self._img, 1)
         
     def height(self):
-        return numpy.size(self._img, 1)
+        return numpy.size(self._img, 0)
+        
+    def channels(self):
+        return numpy.size(self._img, 2)
         
     def dim(self):
         return [self.width(), self.height()]
@@ -36,17 +39,49 @@ class Image:
         self._img = img
     
     def create(width, height):
-        return Image(numpy.zeros((width, height, 3), numpy.uint8))
+        return Image(numpy.zeros((height, width, 3), numpy.uint8))
         
-    # Image Routines
+    # Image Routines - Copy
+    
+    def _composeRGBFromRGBA(self, img, srcX, srcY, destX, destY, width, height):
+        pass
     
     def composeEx(self, img, srcX, srcY, destX, destY, width, height):
-        pass
+        myChannels = self.channels()
+        theirChannels = img.channels();
+        if (theirChannels == 3):
+            if (myChannels == 3):
+                self.copyEx(img, srcC, srcY, destX, destY, width, height)
+                return 
+        elif (theirChannels == 4):
+            if (myChannels == 3):
+                self._composeRGBFromRGBA(img, srcX, srcY, destX, destY, width, height)
+                return
+    
+    
+    def copyEx(self, img, srcX, srcY, destX, destY, width, height):
+        if (img.channels() == self.channels()):
+            srcSlice = img._img[srcY:(srcY+height), srcX:(srcX+width)]
+            destSlice = self._img[destY:(destY+height), destX:(destX+width)]
+            numpy.copyto(destSlice, srcSlice)
+       
         
+    def copy(self, img):
+        self.copyEx(img, 0, 0, 0, 0, img.width(), img.height())
+    
+    # Image Routines: Geometry
+    
+    def fillRect(self, x, y, width, height, color):
+        cv2.rectangle(self._img, (x, y), (x+width, y+height), color, -1)
+            
+    
+    def drawLine(self, x0, y0, x1, y1, color):
+        pass
+    
     # I/O
     
     def load(path):
-        return Frame(cv2.imread(path))
+        return Image(cv2.imread(path))
         
     def save(self, path):
         cv2.imwrite(path, self._img)

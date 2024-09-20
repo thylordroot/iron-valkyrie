@@ -30,7 +30,7 @@ class VideoRenderer:
         self._context = RenderContext()
         self._writer = cv2.VideoWriter(path, 
             cv2.VideoWriter_fourcc(*"mp4v"),
-            1, self._context.dim())
+            self._context.fps(), self._context.dim())
         
     # Rendering
     
