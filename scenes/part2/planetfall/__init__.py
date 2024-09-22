@@ -17,11 +17,13 @@
 
 from renderer.scene import StatefulScene
 from renderer.image import Image
+from renderer.transition.squares import SquaresTransition
 
 class PlanetfallScene(StatefulScene):
     def __init__(self):
-        super().__init__(self)
+        super().__init__()
         self._background = Image.load("assets/png/part2/planetfall/background.png")
+        self._outTransition = SquaresTransition(True)
         
     def _renderBackground(self, context, buffer):
         position = context.framesElapsed()
@@ -36,19 +38,21 @@ class PlanetfallScene(StatefulScene):
             buffer.width(), buffer.height())
         
     def _transitionIn(self, context, buffer):
-        if (self._localFrameCount == 120):
+        print(self.stateFrameCount())
+        if (self.stateFramesElapsed(120)):
             self.nextState()
         
     def _crash(self, context, buffer):
-        if (self._localFrameCount == 120):
+        if (self.stateFramesElapsed(120)):
             self.nextState()
         
     def _parachute(self, context, buffer):
-        if (self._localFrameCount == 120):
+        if (self.stateFramesElapsed(120)):
             self.nextState()
         
     def _transitionOut(self, context, buffer):
-        if (self._localFrameCount == 60):
+        self._outTransition.render(context)
+        if (self.stateFramesElapsed(60)):
             context.makeSceneDone()
 
     def onRenderState(self, context, state):

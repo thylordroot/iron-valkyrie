@@ -46,8 +46,8 @@ class StatefulScene(Scene):
         self._state = self._state + 1
         self._stateFrameCount = 0
         
-    def stateFramesElapsed(self, limit)
-        return self._state >= limit
+    def stateFramesElapsed(self, limit):
+        return self._stateFrameCount >= limit
         
         
     # Rendering
@@ -56,6 +56,6 @@ class StatefulScene(Scene):
     def onRenderState(self, context, state):
         pass
         
-    def renderState(self, context):
-        self.onRenderState(self, context, self._state)
+    def render(self, context):
+        self.onRenderState(context, self._state)
         self._stateFrameCount = self._stateFrameCount + 1
