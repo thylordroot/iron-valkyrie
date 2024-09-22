@@ -15,14 +15,13 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from renderer.scene import Scene
+from renderer.scene import StatefulScene
 from renderer.image import Image
 
-class PlanetfallScene(Scene):
+class PlanetfallScene(StatefulScene):
     def __init__(self):
+        super().__init__(self)
         self._background = Image.load("assets/png/part2/planetfall/background.png")
-        self._state = 0
-        self._localFrameCount = 0
         
     def _renderBackground(self, context, buffer):
         position = context.framesElapsed()
@@ -38,32 +37,28 @@ class PlanetfallScene(Scene):
         
     def _transitionIn(self, context, buffer):
         if (self._localFrameCount == 120):
-            self._stateChange(1)
+            self.nextState()
         
     def _crash(self, context, buffer):
         if (self._localFrameCount == 120):
-            self._stateChange(2)
+            self.nextState()
         
     def _parachute(self, context, buffer):
         if (self._localFrameCount == 120):
-            self._stateChange(3)
+            self.nextState()
         
     def _transitionOut(self, context, buffer):
         if (self._localFrameCount == 60):
             context.makeSceneDone()
 
-    def _stateChange(self, state):
-        self._state = state
-        self._localFrameCount = 0
-
-    def render(self, context):
+    def onRenderState(self, context, state):
         buffer = context.frameBuffer()
         
         # Copy background
         self._renderBackground(context, buffer)
         
         # Now select state handler
-        match(self._state):
+        match(state):
             case 0:
                 self._transitionIn(context, buffer)
             case 1:
@@ -72,10 +67,5 @@ class PlanetfallScene(Scene):
                 self._parachute(context, buffer)
             case 3:
                 self._transitionOut(context, buffer)
-        
-        self._localFrameCount = self._localFrameCount + 1
-        
-        if (context.framesElapsed() >= 360):
-            context.makeSceneDone()
             
             

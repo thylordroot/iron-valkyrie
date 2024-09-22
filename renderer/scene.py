@@ -21,3 +21,41 @@ class Scene(ABC):
     @abstractmethod
     def render(self, context):
         pass;
+
+class StatefulScene(Scene):
+    
+    # Constructors
+    
+    def __init__(self, state=0):
+        self._state = state
+        self._stateFrameCount = 0
+        
+    # State Management
+        
+    def currentState(self):
+        return self._state
+        
+    def stateFrameCount(self):
+        return self._stateFrameCount
+        
+    def setState(self, state):
+        self._state = state
+        self._stateFrameCount = 0
+        
+    def nextState(self):
+        self._state = self._state + 1
+        self._stateFrameCount = 0
+        
+    def stateFramesElapsed(self, limit)
+        return self._state >= limit
+        
+        
+    # Rendering
+    
+    @abstractmethod
+    def onRenderState(self, context, state):
+        pass
+        
+    def renderState(self, context):
+        self.onRenderState(self, context, self._state)
+        self._stateFrameCount = self._stateFrameCount + 1
