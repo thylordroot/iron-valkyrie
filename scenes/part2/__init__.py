@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 #  Iron Valkyrie - A Demo Presentation
 #
 #    Copyright (C) 2024  thylordroot
@@ -17,18 +15,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from renderer import VideoRenderer, Font
-from scenes import *
+from .planetfall import *
 
-Font.bootstrapFonts()
-
-
-renderer = VideoRenderer("test.mp4");
-
-# Render Part 1
-#renderer.renderScenes(TitleScene());
-
-# Render Part 2
-renderer.renderScenes(*[part2.PlanetfallScene()])
-
-renderer.close();
+def createPart2():
+	return [
+        PlanetfallScene()
+    ]
