@@ -53,9 +53,12 @@ class SquaresTransition(Scene):
     def render(self, context):
         buffer = context.frameBuffer()
         
+        counter = 0;
         for y in range(0,buffer.height(),self._tileSz):
             for x in range(0,buffer.width(),self._tileSz):
+                frame = .self_localFrameCount - counter 
                 self._renderTile(buffer, x, y, 
-                    int(self._localFrameCount/self._divisor))
+                    int((frame/self._divisor))
+                counter = (counter + 1) % (self._tileFrames)
                 
         self._localFrameCount = self._localFrameCount + 1
