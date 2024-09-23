@@ -27,7 +27,7 @@ class Atlas:
         return self._height
         
     def dim(self):
-        return (self._width, self_height)
+        return (self._width, self._height)
         
     def count(self):
         return self._count
@@ -48,3 +48,19 @@ class Atlas:
         
     def load(path, width, height, count=-1):
         return Atlas(Image.load(path), width, height, count)
+        
+    # Render
+    
+    def frameFor(self, frame):
+        x = frame % self._pitch[0] * self._width
+        y = int(frame / self._pitch[0]) * self._height
+        return self._img.slice(x, y, self._width, self._height)
+    
+    def compose(self, dest, frame, destX, destY):
+        frame = self.frameFor(frame)
+        dest.composeEx(frame, 0, 0, destX, destY, frame.width(), frame.height())
+    
+    def copy(self, dest, frame, destX, destY):
+        frame = self.frameFor(frame)
+        dest.copyEx(frame, 0, 0, destX, destY, frame.width(), frame.height())
+        pass

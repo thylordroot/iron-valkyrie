@@ -22,6 +22,9 @@ from scenes import *
 
 Font.bootstrapFonts()
 
+font = Font.getFont("spaceage")
+tmp = font.renderText("This is a test! Testing. Testing?")
+tmp.save("foo.png")
 
 renderer = VideoRenderer("test.mp4");
 
@@ -29,6 +32,6 @@ renderer = VideoRenderer("test.mp4");
 #renderer.renderScenes(TitleScene());
 
 # Render Part 2
-renderer.renderScenes(*[part2.PlanetfallScene()])
+renderer.renderScenes(*createPart2())
 
 renderer.close();

@@ -21,14 +21,17 @@ class SquaresTransition(Scene):
 
     # Constructors
 
-    def __init__(self, out=True):
+    def __init__(self, out=True, divisor=4):
         self._out = out;
         self._tileSz = 8
         self._tileFrames = int(self._tileSz/2)
         self._localFrameCount = 0
-        self._divisor = 4;
+        self._divisor = divisor;
     
     # Rendering
+    
+    def reset(self):
+        self._localFrameCount = 0
     
     def _renderTile(self, buffer, x, y, frame):
         if (frame > self._tileFrames):
@@ -48,7 +51,8 @@ class SquaresTransition(Scene):
         
         width = width * 2
         
-        buffer.fillRect(x, y, width, width, (0, 0, 0))
+        if (width > 0):
+            buffer.fillRect(x, y, width, width, (0, 0, 0))
         
     def render(self, context):
         buffer = context.frameBuffer()
@@ -56,9 +60,8 @@ class SquaresTransition(Scene):
         counter = 0;
         for y in range(0,buffer.height(),self._tileSz):
             for x in range(0,buffer.width(),self._tileSz):
-                frame = .self_localFrameCount - counter 
-                self._renderTile(buffer, x, y, 
-                    int((frame/self._divisor))
-                counter = (counter + 1) % (self._tileFrames)
+                frame = int(self._localFrameCount/self._divisor) - counter 
+                self._renderTile(buffer, x, y, frame)
+                counter = (counter + 1) % (self._tileFrames-1)
                 
         self._localFrameCount = self._localFrameCount + 1

@@ -20,3 +20,4 @@ from .atlas import *
 from .font import *
 from .context import *
 from .video import *
+from .textscroller import *

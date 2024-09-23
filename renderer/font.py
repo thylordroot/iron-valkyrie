@@ -16,14 +16,24 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from .atlas import Atlas
+from .image import Image
+from os.path import basename, splitext
+import numpy
 import glob
 
 class Font:
     # Properties
 
-    _fonts = dict()
+    _fonts = None
     
+    def width(self):
+        return self._atlas.width()
     
+    def height(self):
+        return self._atlas.height()
+    
+    def dim(self):
+        return self._atlas.dim()
     
     # Constructors
     
@@ -34,4 +44,36 @@ class Font:
         return Font(Atlas.load(path, width, height, count))
         
     def bootstrapFonts():
-        print(glob.glob("assets/png/font/*.png"))
+        ret = dict()
+        for f in glob.glob("assets/png/font/*.png"):
+            name = splitext(basename(f))[0]
+            font = Font.load(f, 16, 16)
+            ret[name] = font
+        Font._fonts = ret
+        
+    def getFont(name):
+        if (Font._fonts == None):
+            Font.bootstrapFonts()
+        return Font._fonts[name]
+        
+    # Rendering
+    
+    def renderText(self, string):
+        n = len(string)
+        dim = self.dim()
+        ret = Image.create(n * dim[0], dim[1], 4)
+        
+        string = string.upper()
+        offset = 0;
+        for c in string:
+            char = (ord(c) - 32) & 0x3F
+            self._atlas.copy(ret, char, offset, 0)
+            offset = offset + dim[0]
+            
+        return ret
+        
+    def render(self, string, dest, x, y, compose = True):
+        img = self.renderText(string);
+        dest.copyEx(img, 0, 0, x, y, img.width(), img.height())
+        
+        

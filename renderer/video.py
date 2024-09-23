@@ -22,7 +22,6 @@ class VideoRenderer:
 
     # Properties
     
-    
 
     # Constructors
 
@@ -47,7 +46,9 @@ class VideoRenderer:
             return True
 
     def renderScenes(self, *args):
+        print (args)
         for scene in args:
+            print(scene)
             while self._renderSceneFrame(scene):
                 pass
             

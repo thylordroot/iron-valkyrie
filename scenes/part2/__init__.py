@@ -16,8 +16,10 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from .planetfall import *
+from .temple import *
 
 def createPart2():
 	return [
-        PlanetfallScene()
+        PlanetfallScene(),
+        TempleScene()
     ]

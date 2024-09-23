@@ -84,7 +84,7 @@ class RenderContext:
         self._sceneDone = True
     
     def resetElapsed(self):
-        elapsed = 0;
+        self._framesElapsed = 0;
     
     def renderScene(self, scene):
         scene.render(self)

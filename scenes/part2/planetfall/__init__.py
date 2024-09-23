@@ -17,16 +17,26 @@
 
 from renderer.scene import StatefulScene
 from renderer.image import Image
+from renderer.font import Font
 from renderer.transition.squares import SquaresTransition
 
 class PlanetfallScene(StatefulScene):
+    introText = "Somewhere, on the planet below."
+
+
     def __init__(self):
         super().__init__()
+        
+        # Load images
         self._background = Image.load("assets/png/part2/planetfall/background.png")
+        
+        # Set up transitions
+        self._inTransition = SquaresTransition(False)
         self._outTransition = SquaresTransition(True)
+        self._font = Font.getFont("spaceage")
         
     def _renderBackground(self, context, buffer):
-        position = context.framesElapsed()
+        position = int(context.framesElapsed()/2)
         
         # Determine where in the scene we are
         if (position < 200):
@@ -36,10 +46,27 @@ class PlanetfallScene(StatefulScene):
             
         buffer.copyEx(self._background, 0, position, 0, 0,
             buffer.width(), buffer.height())
-        
-    def _transitionIn(self, context, buffer):
-        print(self.stateFrameCount())
+
+    def _renderFlavorText(self, context, buffer):
+        self._font.render("Somewhere on the", buffer, 32, 92)
+        self._font.render("planet below.", buffer, 64, 108)
+
+    def _flavorText(self, context, buffer):
+        self._renderFlavorText(context, buffer)
         if (self.stateFramesElapsed(120)):
+            self.nextState()
+            
+    def _flavorTextTransition(self, context, buffer):
+        self._renderFlavorText(context, buffer)
+        self._outTransition.render(context)
+        if (self.stateFramesElapsed(120)):
+            context.resetElapsed()
+            self._outTransition.reset()
+            self.nextState()
+     
+    def _transitionIn(self, context, buffer):
+        self._inTransition.render(context)
+        if (self.stateFramesElapsed(240)):
             self.nextState()
         
     def _crash(self, context, buffer):
@@ -59,17 +86,22 @@ class PlanetfallScene(StatefulScene):
         buffer = context.frameBuffer()
         
         # Copy background
-        self._renderBackground(context, buffer)
+        if (state > 1):
+            self._renderBackground(context, buffer)
         
         # Now select state handler
         match(state):
             case 0:
-                self._transitionIn(context, buffer)
+                self._flavorText(context, buffer)
             case 1:
-                self._crash(context, buffer)
+                self._flavorTextTransition(context, buffer)
             case 2:
-                self._parachute(context, buffer)
+                self._transitionIn(context, buffer)
             case 3:
+                self._crash(context, buffer)
+            case 4:
+                self._parachute(context, buffer)
+            case 5:
                 self._transitionOut(context, buffer)
             
             
