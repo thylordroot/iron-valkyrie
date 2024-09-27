@@ -33,5 +33,6 @@ class TitleScene(Scene):
     
         if (context.framesElapsed() >= 60):
             context.makeSceneDone()
+            context.resetElapsed()
             
             

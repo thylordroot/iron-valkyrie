@@ -36,12 +36,8 @@ class TempleScene(StatefulScene):
     ]
 
     def _renderCoreAtlas(src, color):
-        img = src.clone();
-        
-        buffer = img._img;
-        mask = (buffer[:,:,0] == 0xFF) & (buffer[:,:,1] == 0xFF) & (buffer[:,:,2] == 0xFF)
-        
-        buffer[:,:,0:3][mask] = color
+        img = src.clone()
+        img.replace((0xFf, 0xFF, 0xFF), color);
     
         return Atlas(img, 16, 16, 16)
 

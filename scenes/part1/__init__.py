@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 #  Iron Valkyrie - A Demo Presentation
 #
 #    Copyright (C) 2024  thylordroot
@@ -17,18 +15,13 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from renderer import VideoRenderer, Font
-from scenes import *
+from .warp import *
+from .wormhole import *
+from .plasma import *
 
-Font.bootstrapFonts()
-
-renderer = VideoRenderer("test.mp4");
-
-# Render Part 1
-renderer.renderScenes(TitleScene());
-renderer.renderScenes(*createPart1())
-
-# Render Part 2
-renderer.renderScenes(*createPart2())
-
-renderer.close();
+def createPart1():
+	return [
+        WarpScene(),
+        WormholeScene(),
+        PlasmaScene()
+    ]

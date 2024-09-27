@@ -183,7 +183,26 @@ class Image:
         else:
             alpha = None
         return Image(img, alpha)
+    
+    # Image Routines: Replace
+    
+    def _replaceSingle(self, src, dest):
+        mask = (self._img[:,:,0] == src[0]) & (self._img[:,:,1] == src[1]) & (self._img[:,:,2] == src[2])
+        self._img[:,:,0:3][mask] = dest
         
+    def _replaceList(self, src, dest):
+        for i in range(0, len(src)):
+            self._replaceSingle(src[i], dest[i])
+    
+    def replace(self, src, dest = None):
+        if (isinstance(src, tuple) and isinstance(dest, tuple)):
+            self._replaceSingle(src, dest)
+        elif (isinstance(src, list) and isinstance(dest, list)):
+            self._replaceList(src, dest)
+        else:
+            raise Exception("Don't know how to do replacement (src={src}, dest={dest}.",
+                src=src, dest=dest)
+    
     # Image Routines: Geometry
     
     def fillRect(self, x, y, width, height, color):
