@@ -21,6 +21,7 @@ from renderer.atlas import Atlas
 from renderer.sprite import Sprite
 from renderer.textscroller import TextScroller
 from renderer.transition.squares import SquaresTransition
+import math;
 
 class WormholeScene(Scene):
     scrollerText = "Why render multiple frames when you can cheat and use palette cycling? The below image is really a single frame. Unfortunately, I had to hack at it a little because the renderer uses BGR and not indexed mode. Still makes for a pretty neat effect."
@@ -75,6 +76,11 @@ class WormholeScene(Scene):
     
         self._textScroller = TextScroller(WormholeScene.scrollerText,
             (0, 0), (320, 16))
+            
+        shipAtlas = Atlas.load("assets\png\part1\spaceship-back.png", 64, 48, 2)
+        self._ship = Sprite(shipAtlas, True)
+        self._ship.x(160-32)
+    
           
     # Rendering
     
@@ -84,6 +90,12 @@ class WormholeScene(Scene):
         frame = int((context.framesElapsed() % (4*self._background.count()))/4)
         self._background.copy(buffer, frame, 0, 16)  
         self._textScroller.render(context)
+        
+        # Now render the ship
+        angle = (context.framesElapsed() % 60) * ((2*math.pi)/60)
+        self._ship.y(100-12 + int(math.sin(angle)*5));
+        self._ship.render(buffer);
+        self._ship.advanceFrame();
         
         if (self._textScroller.done()):
             context.makeSceneDone()

@@ -31,7 +31,7 @@ class TitleScene(Scene):
         buffer.copy(self._background)
         buffer.fillRect(0, 0, buffer.width(), context.framesElapsed(), (0, 0, 0))
     
-        if (context.framesElapsed() >= 60):
+        if (context.framesElapsed() >= 600):
             context.makeSceneDone()
             context.resetElapsed()
             

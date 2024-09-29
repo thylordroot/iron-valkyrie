@@ -22,6 +22,7 @@ from renderer.sprite import Sprite
 from renderer.textscroller import TextScroller
 from renderer.transition.squares import SquaresTransition
 from perlin_noise import PerlinNoise
+import math
 
 def _lerp(x, y, t):
     return (x*(1-t)) + y*t
@@ -165,6 +166,10 @@ class PlasmaScene(Scene):
     
         self._textScroller = TextScroller(PlasmaScene.scrollerText,
             (0, 0), (320, 16))
+            
+        shipAtlas = Atlas.load("assets\png\part1\spaceship-back.png", 64, 48, 2)
+        self._ship = Sprite(shipAtlas, True)
+        self._ship.x(160-32)
           
     # Rendering
     
@@ -174,6 +179,12 @@ class PlasmaScene(Scene):
         frame = int((context.framesElapsed() % self._background.count()))
         self._background.copy(buffer, frame, 0, 16)  
         self._textScroller.render(context)
+        
+        # Now render the ship
+        angle = (context.framesElapsed() % 60) * ((2*math.pi)/60)
+        self._ship.y(100-12 + int(math.sin(angle)*5));
+        self._ship.render(buffer);
+        self._ship.advanceFrame();
         
         if (self._textScroller.done()):
             context.makeSceneDone()

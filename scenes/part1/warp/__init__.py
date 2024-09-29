@@ -21,6 +21,7 @@ from renderer.atlas import Atlas
 from renderer.sprite import Sprite
 from renderer.textscroller import TextScroller
 from renderer.transition.squares import SquaresTransition
+import math
 
 class WarpScene(Scene):
     scrollerText = "Shoutouts to: windy_harper, tawejea, t0zzle, gallara_dragon, nolami amada, tinahacks, tylerraiz, metroidmst, raymmusic, moohoodles, flannel_kat, and probably some other people I forgot."
@@ -72,6 +73,9 @@ class WarpScene(Scene):
     
     def __init__(self):
         self._background = WarpScene._makeBackgroundAtlas()
+        shipAtlas = Atlas.load("assets\png\part1\spaceship-back.png", 64, 48, 2)
+        self._ship = Sprite(shipAtlas, True)
+        self._ship.x(160-32)
     
         self._textScroller = TextScroller(WarpScene.scrollerText,
             (0, 0), (320, 16))
@@ -84,6 +88,12 @@ class WarpScene(Scene):
         frame = int((context.framesElapsed() % (4*self._background.count()))/4)
         self._background.copy(buffer, frame, 0, 16)  
         self._textScroller.render(context)
+        
+        # Now render the ship
+        angle = (context.framesElapsed() % 60) * ((2*math.pi)/60)
+        self._ship.y(100-12 + int(math.sin(angle)*5));
+        self._ship.render(buffer);
+        self._ship.advanceFrame();
         
         if (self._textScroller.done()):
             context.makeSceneDone()

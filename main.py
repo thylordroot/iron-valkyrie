@@ -25,8 +25,8 @@ Font.bootstrapFonts()
 renderer = VideoRenderer("test.mp4");
 
 # Render Part 1
-#renderer.renderScenes(TitleScene());
-#renderer.renderScenes(*createPart1())
+renderer.renderScenes(TitleScene());
+renderer.renderScenes(*createPart1())
 
 # Render Part 2
 renderer.renderScenes(*createPart2())
