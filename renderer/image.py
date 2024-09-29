@@ -17,6 +17,7 @@
 
 import cv2
 import numpy
+from .rect import Rect
 
 class Image:
     # Properties
@@ -38,6 +39,9 @@ class Image:
         
     def dim(self):
         return [self.width(), self.height()]
+       
+    def rect(self):
+        return Rect(0, 0, self.width(), self.height())
        
     # Constructors
         
@@ -72,34 +76,27 @@ class Image:
             alpha = None
         return Image(ret, alpha)
         
-    def composeEx(self, img, srcX, srcY, destX, destY, width, height):
+    def sliceRect(self, rect):
+        return self.slice(rect.x, rect.y, rect.width, rect.height)
+        
+    def _composeEx(self, img, src, dest):
+    
+        if (src.isDegenerate() or dest.isDegenerate()):
+            return;
+        
         myChannels = self.channels()
-        theirChannels = img.channels();
-        
-        clipped = Image._clip(srcX, srcY, img.width(), img.height(),
-            width, height)
-        srcX = clipped[0]
-        srcY = clipped[1]
+        theirChannels = img.channels();    
             
-        clipped = Image._clip(destX, destY, self.width(), self.height(),
-            clipped[2], clipped[3])
-        destX = clipped[0]
-        destY = clipped[1]
-        width = clipped[2]
-        height = clipped[3]
-        
-        if (width < 1 or height < 1):
-            return
-        
+        # 
         if (theirChannels == 3):
             if (myChannels == 3):
-                self.copyEx(img, srcX, srcY, destX, destY, width, height)
+                self._copyEx(img, src, dest)
                 return 
         
         
         # We cannot directly copy, alpha blend instead
-        srcSlice = img.slice(srcX, srcY, width, height)
-        destSlice = self.slice(destX, destY, width, height)
+        srcSlice = img.sliceRect(src)
+        destSlice = self.sliceRect(dest)
         
         if (srcSlice.hasAlpha()):
             alphaBuf = srcSlice._alpha.astype(float) / 255
@@ -109,69 +106,56 @@ class Image:
         else:
             result = srcSlice
             
-        
-            
         # Now copy buffer over
-        self.copyEx(result, 0, 0, destX, destY, width, height)
+        self._copyEx(result, Rect(0, 0, src.width, src.height), dest) 
     
-    def _clip(x, y, srcWidth, srcHeight, destWidth, destHeight):
-        if (x < 0):
-            destWidth += x
-            x = 0
-        if (y < 0):
-            destHeight += y
-            y = 0
+        pass
         
-        if (destWidth > srcWidth):
-            destWidth = srcWidth
-        if (destHeight > srcHeight):
-            destHeight = srcHeight
+    def composeEx(self, img, srcX, srcY, destX, destY, width, height):
+        # Clip source and destination
+        clip = self._clip2(img, srcX, srcY, destX, destY, width, height)
+        return self._composeEx(img, clip[0], clip[1])
+        
+    def _clip2(self, src, srcX, srcY, destX, destY, width, height):
+        dest = self.rect();   
+        
+        # Make sure we have a rectangle
+        if (isinstance(src, Image)):
+            src = src.rect()
             
-        return (x, y, destWidth, destHeight)
-    
-    def _copyEx(self, srcSlice, destSlice):
-        # Copy the color data 
-        srcSlice = img._img[srcY:(srcY+height), srcX:(srcX+width)]
-        destSlice = self._img[destY:(destY+height), destX:(destX+width)]
+        return src.clip2(dest, srcX, srcY, destX, destY, width, height)
         
+    def _copyEx(self, img, src, dest):
+        if (src.isDegenerate() or dest.isDegenerate()):
+            return;
+        elif ((src.width != dest.width) or (src.height != dest.height)):
+            raise Exception("Invalid Geometry");
+           
+        # Copy the color data 
+
+        srcSlice = img._img[(src.y):(src.yBound()), (src.x):(src.xBound())]
+        destSlice = self._img[(dest.y):(dest.yBound()), (dest.x):(dest.xBound())]
+        
+        # Copy BGR buffer
         numpy.copyto(destSlice, srcSlice)
         
         # Copy alpha channel
         if (self.hasAlpha()):
-            destSlice = self._alpha[destY:(destY+height), destX:(destX+width)]
+            #print("Handling alpha channel");
+            destSlice = self._alpha[(dest.y):(dest.yBound()), (dest.x):(dest.xBound())]
             
             # If there is alpha data, copy it now
             if (img.hasAlpha()):
-                srcSlice = img._alpha[srcY:(srcY+height), srcX:(srcX+width)]
+                srcSlice = img._alpha[(src.y):(src.yBound()), (src.x):(src.xBound())]
                 numpy.copyto(destSlice, srcSlice)
             # Else, fill with solid alpha
             else:
                 destSlice.fill(0xFF)
                 
     def copyEx(self, img, srcX, srcY, destX, destY, width, height):
-        # Clip copied region
-        clip = Image._clip(srcX, srcY, img.width(), img.height(),
-            width, height)
-    
-        # Copy the color data 
-        srcSlice = img._img[srcY:(srcY+height), srcX:(srcX+width)]
-        destSlice = self._img[destY:(destY+height), destX:(destX+width)]
-        
-        numpy.copyto(destSlice, srcSlice)
-        
-        # Copy alpha channel
-        if (self.hasAlpha()):
-            destSlice = self._alpha[destY:(destY+height), destX:(destX+width)]
-            
-            # If there is alpha data, copy it now
-            if (img.hasAlpha()):
-                srcSlice = img._alpha[srcY:(srcY+height), srcX:(srcX+width)]
-                numpy.copyto(destSlice, srcSlice)
-            # Else, fill with solid alpha
-            else:
-                raise Exception("Got here ({hasAlpha})".format(hasAlpha=img.hasAlpha()))
-                
-                destSlice.fill(0xFF)
+        # Clip source and destination
+        clip = self._clip2(img, srcX, srcY, destX, destY, width, height)
+        self._copyEx(img, clip[0], clip[1])
         
     def copy(self, img):
         self.copyEx(img, 0, 0, 0, 0, img.width(), img.height())
@@ -228,3 +212,8 @@ class Image:
             alpha = src[:,:,3:4]
             numpy.copyto(bgr, self._img)
         cv2.imwrite(path, src)
+        
+    # Conversion
+    
+    def __str__(self):
+        return "[{width}x{height} image]".format(width=self.width(), height=self.height());

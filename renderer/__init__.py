@@ -20,4 +20,5 @@ from .atlas import *
 from .font import *
 from .context import *
 from .video import *
+from .rect import *
 from .textscroller import *

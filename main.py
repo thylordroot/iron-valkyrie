@@ -17,7 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from renderer import VideoRenderer, Font
+from renderer import VideoRenderer, Font, Rect
 from scenes import *
 
 Font.bootstrapFonts()
@@ -25,8 +25,8 @@ Font.bootstrapFonts()
 renderer = VideoRenderer("test.mp4");
 
 # Render Part 1
-renderer.renderScenes(TitleScene());
-renderer.renderScenes(*createPart1())
+#renderer.renderScenes(TitleScene());
+#renderer.renderScenes(*createPart1())
 
 # Render Part 2
 renderer.renderScenes(*createPart2())
