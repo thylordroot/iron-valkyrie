@@ -22,6 +22,7 @@ from renderer.sprite import Sprite
 from renderer.textscroller import TextScroller
 from renderer.transition.squares import SquaresTransition
 from .scout import Scout
+from random import randrange
 
 
 class FightScene(StatefulScene):
@@ -34,7 +35,7 @@ class FightScene(StatefulScene):
         
         # Load Images 
         shipFront = Atlas.load("assets/png/part1/spaceship-side.png", 64, 48, 2)
-        bigBird = Atload.load("assets/png/part1/fight/big-bird.png", 128, 64, 2)
+        bigBird = Atlas.load("assets/png/part1/fight/big-bird.png", 128, 64, 2)
         
         # Set up transitions
         self._inTransition = SquaresTransition(False)
@@ -43,13 +44,17 @@ class FightScene(StatefulScene):
         # Set up scrollers
         self._textScroller = TextScroller(FightScene.scrollerText,
             (0, 0), (320, 16))
+        self._textScroller2 = TextScroller("Wait, what is that thing?! Its huge!",
+            (0, 0), (320, 16))
             
         # Set up sprites
         self._ship = Sprite(shipFront, True)
+        self._ship.pos((0, 100-32))
         self._bigBird = Sprite(bigBird, False)
         scouts = []
         for i in range(0, 8):
             scouts.append(Scout())
+        self._scouts = scouts
         
     def _transitionIn(self, context, buffer):
         self._inTransition.render(context)
@@ -58,19 +63,72 @@ class FightScene(StatefulScene):
             self.nextState()
         
     def _doScouts(self, context, buffer):
-        if (self.stateFramesElapsed(1200)):
+        maxScouts = int(self.stateFrameCount() / 60);
+        if (maxScouts >= 8):
+            maxScouts = 7;
+            
+        
+        for i in range(0, maxScouts+1):
+            scout = self._scouts[i]
+            if (not scout.enabled()):
+                scout.pos((320, 100))
+                scout.enabled(True)
+                scout.velocity((-4, randrange(-16, 16)/8))
+            
+            scout.renderAndUpdate(buffer)
+            # Recycle sprites that are off screen
+            if (scout.x() < -scout.width() or scout.y() < -scout.height() 
+                or scout.y() > buffer.height() + scout.height()):
+                scout.enabled(False)
+        
+        self._textScroller.render(context)
+        if (self._textScroller.done()):
+            self._bigBird.enabled(True)
+            self.nextState()
+            
+    def _clearScouts(self, context, buffer):
+        count = 0;
+        for i in range(0, 8):
+            scout = self._scouts[i]
+            if (scout.enabled()):
+                scout.renderAndUpdate(buffer)
+                # Recycle sprites that are off screen
+                if (scout.x() < -scout.width() or scout.y() < -scout.height() 
+                    or scout.y() > buffer.height() + scout.height()):
+                    scout.enabled(False)
+                count += 1
+        if (count == 0):
+            self._bigBird.enabled(True)
+            self._bigBird.pos((320, 100-32)) 
+            self.nextState()
+            
+    def _renderBigBird(self, context, buffer):
+        self._bigBird.render(buffer)
+        self._bigBird.advanceFrame()
+        
+        if (self._bigBird.x() > 160):
+            self._bigBird.x(self._bigBird.x() - 1)
+    
+        self._textScroller2.render(context)
+        if (self._textScroller2.done()):
             self.nextState()
             
     def _transitionOut(self, context, buffer):
-        
-    
-    
+        self._ship.pos((
+            self._ship.x() + 1,
+            self._ship.y() + 1
+        ))
         self._outTransition.render(context)
         if (self.stateFramesElapsed(60)):
             context.makeSceneDone()
 
     def onRenderState(self, context, state):
         buffer = context.frameBuffer()
+        
+        buffer.fillRect(0, 0, 320, 200, (0,0,0))
+        
+        self._ship.render(buffer)
+        self._ship.advanceFrame()
         
         # Now select state handler
         match(state):
@@ -79,7 +137,11 @@ class FightScene(StatefulScene):
             case 1:
                 self._doScouts(context, buffer)
             case 2:
+                self._clearScouts(context, buffer)
+            case 3:
+                self._renderBigBird(context, buffer)
+            case 4:
                 self._transitionOut(context, buffer)
-            
-        if (state != 0):
-            self._textScroller.render(context)
+                
+        
+        

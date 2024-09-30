@@ -32,6 +32,12 @@ class Sprite:
             self._y = new;
         return self._y;
     
+    def width(self):
+        return self._atlas.width()
+        
+    def height(self):
+        return self._atlas.height()
+    
     def pos(self, new=None):
         if (not new is None):
             self._x = new[0]
@@ -69,4 +75,4 @@ class Sprite:
         self._frame = (self._frame + 1) % self._atlas.count()
     
     def render(self, buffer):
-        self._atlas.compose(buffer, self._frame, self._x, self._y) 
+        self._atlas.compose(buffer, self._frame, int(self._x), int(self._y)) 

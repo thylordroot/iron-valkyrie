@@ -19,7 +19,7 @@ from renderer.atlas import Atlas
 from renderer.sprite import Sprite
 
 class Scout(Sprite):
-    _atlas = Atlas.load("assets\png\part1\spaceship-back.png", 48, 16, 2)
+    _atlas = Atlas.load("assets/png/part1/fight/bird-scout.png", 48, 16, 2)
     
     # Properties
     
@@ -38,13 +38,13 @@ class Scout(Sprite):
     # Constructors
     
     def __init__(self):
-        super.__init__(Scout._atlas, true)
+        super(Scout, self).__init__(Scout._atlas, False)
         self._dx = 0;
         self._dy = 0
     
     # Rendering
     
-    def renderAndUpdate(buffer):
+    def renderAndUpdate(self, buffer):
         self.render(buffer)
         self._x += self._dx;
         self._y += self._dy;
