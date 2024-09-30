@@ -22,6 +22,7 @@ from renderer.sprite import Sprite
 from renderer.textscroller import TextScroller
 from renderer.transition.squares import SquaresTransition
 from .scout import Scout
+from .starfield import Starfield
 from random import randrange
 
 
@@ -51,6 +52,7 @@ class FightScene(StatefulScene):
         self._ship = Sprite(shipFront, True)
         self._ship.pos((0, 100-32))
         self._bigBird = Sprite(bigBird, False)
+        self._starField = Starfield(320, 184, 16, 3, 100)
         scouts = []
         for i in range(0, 8):
             scouts.append(Scout())
@@ -126,6 +128,7 @@ class FightScene(StatefulScene):
         buffer = context.frameBuffer()
         
         buffer.fillRect(0, 0, 320, 200, (0,0,0))
+        self._starField.renderAndUpdate(buffer)
         
         self._ship.render(buffer)
         self._ship.advanceFrame()

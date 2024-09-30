@@ -19,8 +19,10 @@
 
 from renderer import VideoRenderer, Font, Rect
 from scenes import *
+from random import seed
 
 Font.bootstrapFonts()
+seed(12345678)
 
 renderer = VideoRenderer("test.mp4");
 
