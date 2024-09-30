@@ -18,10 +18,14 @@
 from .warp import *
 from .wormhole import *
 from .plasma import *
+from .landing import *
+from .fight import *
 
 def createPart1():
 	return [
         WarpScene(),
         WormholeScene(),
-        PlasmaScene()
+        PlasmaScene(),
+        LandingScene(),
+        FightScene()
     ]
